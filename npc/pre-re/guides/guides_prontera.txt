@@ -23,7 +23,7 @@
 //	-Thanks to Brainstorm.
 //============================================================
 
-prontera,154,187,4	script	Guide#prt::PrtGuide	105,{
+prontera,136,231,5	script	Guide#prt::PrtGuide	105,{
 	cutin "prt_soldier",2;
 	mes "[Prontera Guide]";
 	mes "Welcome to Prontera,";
@@ -222,7 +222,7 @@ prontera,154,187,4	script	Guide#prt::PrtGuide	105,{
 			mes "[Prontera Guide]";
 			mes "Well, adventurer...";
 			mes "I hope your journeys";
-			mes "through Rune-Midgarts";
+			mes "through Rune-Midgard";
 			mes "are both fun and safe.";
 			close2;
 			set .@loop1,0;

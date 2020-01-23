@@ -1,0 +1,133 @@
+//job
+
+
+prontera,154,197,5	script	Third Baby Job Changer	10192,{
+mes "Welcome!";
+mes "I am here to fix third job quest issues. It includes ninja and gunslingers.";
+mes "You need to be base level 99, job 50 and up, you need to be rebirth and 10,000,000 zeny.";
+next;
+switch(select("Proceed:Cancel")){
+    case 1:
+        if (BaseLevel > 98 && JobLevel > 49 ){
+            if (Zeny > 10000000){
+                if (checkfalcon() || checkcart() || checkriding() || ismounting()) {
+                    mes "Please remove your " +
+                        ((checkfalcon()) ? "falcon" : "") +
+                        ((checkcart()) ? "cart" : "") +
+                        ((checkriding()) ? "Peco" : "") +
+                        ((ismounting()) ? "mount" : "") +
+                        " before proceeding.";
+                    close;
+                }
+                if (.SkillPointCheck && SkillPoint) {
+                    mes "Please use all your skill points before proceeding.";
+                    close;
+                }
+                if (Class == Job_Baby_Knight){
+					jobchange 4096;
+					set JobLevel, 70;
+					set SkillPoint, 20;
+					getItem 24246,1;
+                }
+				if (Class == Job_Baby_Crusader){
+					jobchange 4102;
+					set JobLevel, 70;
+					set SkillPoint, 20;
+					getItem 24250,1;
+                }
+				if (Class == Job_Baby_Wizard){
+					jobchange 4097;
+					set JobLevel, 70;
+					set SkillPoint, 20;
+					getItem 24249,1;
+                }
+				if (Class == Job_Baby_Sage){
+					jobchange 4103;
+					set JobLevel, 70;
+					set SkillPoint, 20;
+					getItem 24254,1;
+                }
+				if (Class == Job_Baby_Hunter){
+					jobchange 4098;
+					set JobLevel,70;
+					set SkillPoint,0;
+					getItem 28392,1;
+                }
+				if (Class == Job_Baby_Bard){
+					jobchange 4104;
+					set JobLevel, 70;
+					set SkillPoint, 20;
+					getItem 24255,1;
+                }
+				if (Class == Job_Baby_Dancer){
+					jobchange 4105;
+					set JobLevel, 70;
+					set SkillPoint, 20;
+					getItem 24255,1;
+                }
+				if (Class == Job_Baby_Priest){
+					jobchange 4099;
+					set JobLevel, 70;
+					set SkillPoint, 20;
+					getItem 24248,1;
+                }
+				if (Class == Job_Baby_Monk){
+					jobchange 4106;
+					set JobLevel, 70;
+					set SkillPoint, 20;
+					getItem 24252,1;
+                }
+				if (Class == Job_Baby_Blacksmith){
+					jobchange 4100;
+					set JobLevel, 70;
+					set SkillPoint, 20;
+					getItem 24247,1;
+                }
+				if (Class == Job_Baby_Alchemist){
+					jobchange 4107;
+					set JobLevel, 70;
+					set SkillPoint, 20;
+					getItem 24251,1;
+                }
+				if (Class == Job_Baby_Assassin){
+					jobchange 4101;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+					getItem 28391,1;
+                }
+				if (Class == Job_Baby_Rogue){
+					jobchange 4108;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+					getItem 28392,1;
+                }
+				if (Class == Job_Baby_Ninja){
+					jobchange 4223,4224;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+				if (Class == Job_Baby_Gunslinger){
+					jobchange 4229;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+                else {
+                mes "Your class is not elligible for the use of my services.";
+                close;
+                }
+                Zeny -= 10000000;
+            }
+            else{
+                mes "You do not have the proper amount of money to proceed.";
+                close;
+            }
+        }
+        else{
+            mes "You do not have the proper levels to proceed.";
+            close;
+        }
+
+    case 2:
+        close;
+    }
+}

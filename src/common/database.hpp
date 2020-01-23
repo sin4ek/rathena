@@ -12,7 +12,6 @@
 
 #include "cbasetypes.hpp"
 #include "core.hpp"
-#include "utilities.hpp"
 
 class YamlDatabase{
 // Internal stuff
@@ -47,8 +46,6 @@ protected:
 	bool asFloat(const YAML::Node &node, const std::string &name, float &out);
 	bool asDouble(const YAML::Node &node, const std::string &name, double &out);
 	bool asString(const YAML::Node &node, const std::string &name, std::string &out);
-	bool asUInt16Rate(const YAML::Node& node, const std::string& name, uint16& out, uint16 maximum=10000);
-	bool asUInt32Rate(const YAML::Node& node, const std::string& name, uint32& out, uint32 maximum=10000);
 
 public:
 	YamlDatabase( const std::string type_, uint16 version_, uint16 minimumVersion_ ){
@@ -85,10 +82,6 @@ public:
 		this->data.clear();
 	}
 
-	bool empty(){
-		return this->data.empty();
-	}
-
 	bool exists( keytype key ){
 		return this->find( key ) != nullptr;
 	}
@@ -117,14 +110,6 @@ public:
 
 	size_t size(){
 		return this->data.size();
-	}
-
-	std::shared_ptr<datatype> random(){
-		if( this->empty() ){
-			return nullptr;
-		}
-
-		return rathena::util::umap_random( this->data );
 	}
 };
 

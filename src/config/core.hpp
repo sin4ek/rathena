@@ -44,10 +44,10 @@
 //#define SHOW_SERVER_STATS
 
 /// Uncomment to enable the job base HP/SP table (job_basehpsp_db.txt)
-#define HP_SP_TABLES
+//#define HP_SP_TABLES
 
 /// Uncomment to enable VIP system.
-//#define VIP_ENABLE
+#define VIP_ENABLE
 
 /// Enable VIP script changes? (requires VIP_ENABLE)
 /// The primary effects of this are restrictions on non-VIP players, such as requiring
@@ -56,10 +56,10 @@
 #define VIP_SCRIPT 0
 
 #ifdef VIP_ENABLE
-	#define MIN_STORAGE 300 // Default number of storage slots.
-	#define MIN_CHARS 3 // Default number of characters per account.
-	#define MAX_CHAR_VIP 6 // This must be less than MAX_CHARS
-	#define MAX_CHAR_BILLING 0 // This must be less than MAX_CHARS
+	#define MIN_STORAGE 600 // Default number of storage slots.
+	#define MIN_CHARS 9 // Default number of characters per account.
+	#define MAX_CHAR_VIP 3 // This must be less than MAX_CHARS
+	#define MAX_CHAR_BILLING 3 // This must be less than MAX_CHARS
 #endif
 
 /// Comment to disable warnings for deprecated script commands

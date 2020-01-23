@@ -13,7 +13,7 @@
 //= 1.0 First version, edited. [Euphy]
 //============================================================
 
-prontera,156,185,5	script	Devil Square Guardian#1	406,{
+prontera,146,164,6	script	Devil Square Guardian#1	 10190,{
 	set .@gm_level, 99; // GM level required to start/stop the event
 
 	mes "[Devil Square Guardian]";
@@ -216,7 +216,7 @@ OnStopEvent:
 	end;
 }
 
-ordeal_1-1,246,245,7	script	Devil Square Guardian#2	406,{
+ordeal_1-1,246,245,7	script	Devil Square Guardian#2	 10190,{
 	mes "[Exit]";
 	mes "Farewell.";
 	close2;

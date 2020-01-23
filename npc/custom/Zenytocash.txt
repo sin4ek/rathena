@@ -1,0 +1,19 @@
+if( select( "Exchange Zeny to Cash","Cancel" ) == 1 ){
+
+if( Zeny < 100000000 ){
+
+mes "You need 100,000,000";
+
+}else{
+
+Zeny -= 100000000;
+
+#CASHPOINTS += 1000;
+
+mes "Done";
+
+}
+
+}
+
+close;

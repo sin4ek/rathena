@@ -2,8 +2,11 @@
 // GRF Files
 // Add as many as needed.
 //-----------------------------------------
-//grf: C:\Program Files\Gravity\RO\rdata.grf
-//grf: C:\Program Files\Gravity\RO\data.grf
+grf: D:\rAthena\kRO_20190601 pre-re\rathena_resources.grf
+grf: D:\rAthena\kRO_20190601 pre-re\pre20190427.grf
+grf: D:\rAthena\kRO_20190601 pre-re\renewal20190427.grf
+grf: D:\rAthena\kRO_20190601 pre-re\rdata.grf
+grf: D:\rAthena\kRO_20190601 pre-re\data.grf
 
 //-----------------------------------------
 // Data Directory

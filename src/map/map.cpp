@@ -160,6 +160,8 @@ struct map_cache_map_info {
 };
 
 char motd_txt[256] = "conf/motd.txt";
+char help_txt[256] = "conf/help.txt";
+char help2_txt[256] = "conf/help2.txt";
 char charhelp_txt[256] = "conf/charhelp.txt";
 char channel_conf[256] = "conf/channels.conf";
 
@@ -3658,7 +3660,7 @@ void map_flags_init(void){
 			continue;
 
 		// adjustments
-		if( battle_config.pk_mode && !mapdata_flag_vs2(mapdata) )
+		if( battle_config.pk_mode && !mapdata->flag[MF_PVP] )
 			mapdata->flag[MF_PVP] = true; // make all maps pvp for pk_mode [Valaris]
 	}
 }
@@ -3680,10 +3682,15 @@ void map_data_copy(struct map_data *dst_map, struct map_data *src_map) {
 	dst_map->skill_duration.insert(src_map->skill_duration.begin(), src_map->skill_duration.end());
 
 	dst_map->zone = src_map->zone;
+	dst_map->qi_count = 0;
+	dst_map->qi_data = NULL;
 
 	// Mimic questinfo
-	if (!src_map->qi_data.empty())
-		src_map->qi_data = dst_map->qi_data;
+	if (src_map->qi_count) {
+		dst_map->qi_count = src_map->qi_count;
+		CREATE(dst_map->qi_data, struct questinfo, dst_map->qi_count);
+		memcpy(dst_map->qi_data, src_map->qi_data, dst_map->qi_count * sizeof(struct questinfo));
+	}
 }
 
 /**
@@ -3898,6 +3905,8 @@ int map_readallmaps (void)
 
 		memset(&mapdata->save, 0, sizeof(struct point));
 		mapdata->damage_adjust = {};
+		mapdata->qi_count = 0;
+		mapdata->qi_data = NULL;
 		mapdata->channel = NULL;
 	}
 
@@ -4074,6 +4083,10 @@ int map_config_read(const char *cfgName)
 			save_settings = cap_value(atoi(w2),CHARSAVE_NONE,CHARSAVE_ALL);
 		else if (strcmpi(w1, "motd_txt") == 0)
 			safestrncpy(motd_txt, w2, sizeof(motd_txt));
+		else if (strcmpi(w1, "help_txt") == 0)
+			safestrncpy(help_txt, w2, sizeof(help_txt));
+		else if (strcmpi(w1, "help2_txt") == 0)
+			safestrncpy(help2_txt, w2, sizeof(help2_txt));
 		else if (strcmpi(w1, "charhelp_txt") == 0)
 			safestrncpy(charhelp_txt, w2, sizeof(charhelp_txt));
 		else if (strcmpi(w1, "channel_conf") == 0)
@@ -4340,31 +4353,110 @@ int log_sql_init(void)
 	return 0;
 }
 
-void map_remove_questinfo(int m, struct npc_data *nd) {
+struct questinfo *map_add_questinfo(int m, struct questinfo *qi) {
+	unsigned short i;
 	struct map_data *mapdata = map_getmapdata(m);
-	struct s_questinfo *qi;
 
-	nullpo_retv(nd);
-	nullpo_retv(mapdata);
+	/* duplicate, override */
+	for(i = 0; i < mapdata->qi_count; i++) {
+		if( &mapdata->qi_data[i] && mapdata->qi_data[i].nd == qi->nd && mapdata->qi_data[i].quest_id == qi->quest_id)
+			break;
+	}
 
-	for (int i = 0; i < mapdata->qi_data.size(); i++) {
-		qi = &mapdata->qi_data[i];
-		if (qi && qi->nd == nd) {
-			script_free_code(qi->condition);
-			mapdata->qi_data.erase(mapdata->qi_data.begin() + i);
+	if( i == mapdata->qi_count )
+		RECREATE(mapdata->qi_data, struct questinfo, ++mapdata->qi_count);
+	else { // clear previous criteria on override
+		if (mapdata->qi_data[i].jobid)
+			aFree(mapdata->qi_data[i].jobid);
+		mapdata->qi_data[i].jobid = NULL;
+		mapdata->qi_data[i].jobid_count = 0;
+		if (mapdata->qi_data[i].req)
+			aFree(mapdata->qi_data[i].req);
+		mapdata->qi_data[i].req = NULL;
+		mapdata->qi_data[i].req_count = 0;
+	}
+
+	memcpy(&mapdata->qi_data[i], qi, sizeof(struct questinfo));
+	return &mapdata->qi_data[i];
+}
+
+bool map_remove_questinfo(int m, struct npc_data *nd) {
+	unsigned short i, c;
+	struct map_data *mapdata = map_getmapdata(m);
+
+	for(i = 0; i < mapdata->qi_count; i++) {
+		struct questinfo *qi = &mapdata->qi_data[i];
+		if( qi->nd == nd ) {
+			if (qi->jobid)
+				aFree(qi->jobid);
+			qi->jobid = NULL;
+			qi->jobid_count = 0;
+
+			if (qi->req)
+				aFree(qi->req);
+			qi->req = NULL;
+			qi->req_count = 0;
+
+			memset(&mapdata->qi_data[i], 0, sizeof(mapdata->qi_data[i]));
 		}
 	}
+
+	// Move next data to empty slot
+	for(i = 0, c = 0; i < mapdata->qi_count; i++) {
+		struct questinfo *qi = &mapdata->qi_data[i];
+		if (!qi || !qi->nd)
+			continue;
+
+		if (i != c) {
+			mapdata->qi_data[c] = mapdata->qi_data[i];
+			memset(&mapdata->qi_data[i], 0, sizeof(mapdata->qi_data[i]));
+		}
+
+		c++;
+	}
+
+	if (!(mapdata->qi_count = c)) {
+		aFree(mapdata->qi_data);
+		mapdata->qi_data = NULL;
+	}
+	else
+		RECREATE(mapdata->qi_data, struct questinfo, mapdata->qi_count);
+
+	return true;
 }
 
 static void map_free_questinfo(struct map_data *mapdata) {
-	nullpo_retv(mapdata);
+	unsigned short i;
+	if (!mapdata)
+		return;
 
-	for (const auto &it : mapdata->qi_data) {
-		if (it.condition)
-			script_free_code(it.condition);
+	for(i = 0; i < mapdata->qi_count; i++) {
+		if (mapdata->qi_data[i].jobid)
+			aFree(mapdata->qi_data[i].jobid);
+		mapdata->qi_data[i].jobid = NULL;
+		mapdata->qi_data[i].jobid_count = 0;
+		if (mapdata->qi_data[i].req)
+			aFree(mapdata->qi_data[i].req);
+		mapdata->qi_data[i].req = NULL;
+		mapdata->qi_data[i].req_count = 0;
+	}
+	aFree(mapdata->qi_data);
+	mapdata->qi_data = NULL;
+	mapdata->qi_count = 0;
+}
+
+struct questinfo *map_has_questinfo(int m, struct npc_data *nd, int quest_id) {
+	unsigned short i;
+	struct map_data *mapdata = map_getmapdata(m);
+
+	for (i = 0; i < mapdata->qi_count; i++) {
+		struct questinfo *qi = &mapdata->qi_data[i];
+		if (qi->nd == nd && qi->quest_id == quest_id) {
+			return qi;
+		}
 	}
 
-	mapdata->qi_data.clear();
+	return NULL;
 }
 
 /**
@@ -4517,7 +4609,7 @@ static int map_mapflag_pvp_stop_sub(struct block_list *bl, va_list ap)
 enum e_mapflag map_getmapflag_by_name(char* name)
 {
 	char flag_constant[255];
-	int64 mapflag;
+	int mapflag;
 
 	safesnprintf(flag_constant, sizeof(flag_constant), "mf_%s", name);
 
@@ -4755,9 +4847,9 @@ bool map_setmapflag_sub(int16 m, enum e_mapflag mapflag, bool status, union u_ma
 
 			mapdata->flag[mapflag] = status;
 			if (!status)
-				mapdata->zone ^= (1 << (args->flag_val + 1)) << 3;
+				mapdata->zone ^= 1 << (args->flag_val + 1);
 			else
-				mapdata->zone |= (1 << (args->flag_val + 1)) << 3;
+				mapdata->zone |= 1 << (args->flag_val + 1);
 			break;
 		case MF_NOCOMMAND:
 			if (status) {
@@ -5137,6 +5229,7 @@ int do_init(int argc, char *argv[])
 	LOG_CONF_NAME="conf/log_athena.conf";
 	MAP_CONF_NAME = "conf/map_athena.conf";
 	BATTLE_CONF_FILENAME = "conf/battle_athena.conf";
+	ATCOMMAND_CONF_FILENAME = "conf/atcommand_athena.conf";
 	SCRIPT_CONF_NAME = "conf/script_athena.conf";
 	GRF_PATH_FILENAME = "conf/grf-files.txt";
 	safestrncpy(console_log_filepath, "./log/map-msg_log.log", sizeof(console_log_filepath));

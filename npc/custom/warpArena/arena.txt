@@ -1,0 +1,19 @@
+// Warp Arena.
+
+
+//Prontera City
+prontera,164,169,0	script	quiz_02-1	45,2,2,{
+OnTouch_:
+	if ((Upper != 1 && BaseLevel<100) || (Upper == 1 && BaseLevel<100)) {
+		warp "quiz_02",45,385;
+	}
+	else {
+		warp "quiz_02",337,83;
+	}
+	end;
+}
+
+//Emperium 
+
+quiz_02,315,71	monster	Emperium	3000,1,6000,6600
+quiz_02,22,370	monster	Emperium	3000,1,6000,6600

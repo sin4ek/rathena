@@ -16,4 +16,4 @@
 //    8: Sale
 //
 // Price:
-//    Item cost, in cash points (#CASHPOINTS).
+//    Item cost, in cash points (#CASHEPOINTS).

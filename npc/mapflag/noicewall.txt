@@ -142,3 +142,6 @@ nguild_prt	mapflag	noicewall
 // Poring War ====================
 poring_w01	mapflag	noicewall
 poring_w02	mapflag	noicewall
+
+//Other
+quiz_02	mapflag	noicewall

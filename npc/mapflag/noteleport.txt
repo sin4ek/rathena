@@ -429,3 +429,5 @@ nyd_dun02	mapflag	noteleport
 2012rwc_08	mapflag	noteleport
 
 //evt_zombie	mapflag	noteleport
+
+quiz_02	mapflag	noteleport

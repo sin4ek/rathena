@@ -15,7 +15,7 @@
 //= 1.9 Migrate/Integrate to Global Functions Platinum Skills. [mazvi]
 //============================================================
 
-prontera,153,193,6	script	Job Master	123,{
+prontera,153,193,6	script	Job Master	622,{
 function Get_Job_Equip;
 // Checks if the Player has the required level.
 // closes if not, returns if yes
@@ -418,6 +418,10 @@ function	Get_Job_Equip	{
 				getitem 1960,1;	break;	//	Whip [1]
 			case Job_Super_Novice:
 				getitem 1208,1;	break;	//	Main Gauche [4]
+			case Job_Gunslinger:
+				getitem 13101,1; break;	//	Six Shooter [2]
+			case Job_Ninja:
+				getitem 13010,1; break;	//	Asura [2]
 			case Job_Star_Gladiator:
 				getitem 1550,1;	break;	//	Book [3]
 			case Job_Soul_Linker:
@@ -440,10 +444,6 @@ function	Get_Job_Equip	{
 				getitem 1302,1;	break;	//	Axe [4]
 			case Job_Thief:
 				getitem 1208,1;	break;	//	Main Gauche [4]
-			case Job_Gunslinger:
-				getitem 13101,1; break;	//	Six Shooter [2]
-			case Job_Ninja:
-				getitem 13010,1; break;	//	Asura [2]
 		}
 	}
 	return;
@@ -459,7 +459,7 @@ OnInit:
 	.SecondExpanded = true;		// Enable new expanded second classes: Ex. Super Novice, Kagerou/Oboro, Rebellion?
 	.BabyNovice = true;	// Enable Baby novice classes? Disable it if you like player must have parent to get job baby.
 	.BabyClass = true;				// Enable Baby classes?
-	.BabyThird = true;				// Enable Baby third classes?
+	.BabyThird = false;				// Enable Baby third classes?
 	.BabyExpanded = true;			// Enable Baby Expanded classes: Ex. Baby Ninja, Baby Taekwon, etc.
 	.BabySummoner = true;			// Enable Baby Summoner?
 	.LastJob = true;				// Enforce linear class changes?

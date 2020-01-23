@@ -12,7 +12,7 @@
 //= 1.1 Optimized, and fixed some requirements. [Euphy]
 //============================================================
 
-geffen,115,107,5	script	Lord Kaho's Servant	61,{
+prontera,153,183,5	script	Lord Kaho's Servant	61,{
 
 	setarray .@Items[0],7005, 968, 923, 734, 724,2268,7036,7020,5053,7018,741,742,743,750,751,752,753,754;
 	setarray .@Drops[0],1272,1087,1039,1260,1046,1115,1252,1147,1038,1059;
@@ -64,6 +64,6 @@ geffen,115,107,5	script	Lord Kaho's Servant	61,{
 	set Zeny, Zeny-5000000;
 	mes "Wow! You are brave indeed!";
 	getitem 5013,1;
-	mes "Enjoy being God of Midgard!";
+	mes "Enjoy being God of Rune-Midgard!";
 	close;
 }

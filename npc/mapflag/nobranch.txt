@@ -234,7 +234,7 @@ prt_are01	mapflag	nobranch
 // PvP Arenas ==================
 pvp_y_room	mapflag	nobranch
 pvp_n_room	mapflag	nobranch
-
+quiz_02	mapflag	nobranch
 // Main City maps ==============
 alberta	mapflag	nobranch
 aldebaran	mapflag	nobranch

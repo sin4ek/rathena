@@ -416,9 +416,6 @@ static TIMER_FUNC(unit_walktoxy_timer){
 			// Copying is required in case someone uses unitwalkto inside the event code
 			safestrncpy(walk_done_event, ud->walk_done_event, EVENT_NAME_LENGTH);
 
-			//Clear the event
-			ud->walk_done_event[0] = 0;
-
 			ud->state.walk_script = true;
 
 			// Execute the event
@@ -437,6 +434,11 @@ static TIMER_FUNC(unit_walktoxy_timer){
 				return 0;
 			}
 
+			// Check if another event was set
+			if( !strcmp(ud->walk_done_event,walk_done_event) ){
+				// If not remove it
+				ud->walk_done_event[0] = 0;
+			}
 		}
 	}
 
@@ -1123,7 +1125,6 @@ int unit_blown(struct block_list* bl, int dx, int dy, int count, enum e_skill_bl
  *		0x1 - Offensive (not set: self skill, e.g. Backslide)
  *		0x2 - Knockback type (not set: Stop type, e.g. Ankle Snare)
  *		0x4 - Boss attack
- *		0x8 - Ignore target player 'special_state.no_knockback'
  * @return reason for immunity
  *		UB_KNOCKABLE - can be knocked back / stopped
  *		UB_NO_KNOCKBACK_MAP - at WOE/BG map
@@ -1152,7 +1153,7 @@ enum e_unit_blown unit_blown_immune(struct block_list* bl, uint8 flag)
 				if( !(flag&0x4) && sd->sc.data[SC_BASILICA] && sd->sc.data[SC_BASILICA]->val4 == sd->bl.id)
 					return UB_TARGET_BASILICA;
 				// Target has special_state.no_knockback (equip)
-				if( (flag&(0x1|0x2)) && !(flag&0x8) && sd->special_state.no_knockback )
+				if( (flag&(0x1|0x2)) && sd->special_state.no_knockback )
 					return UB_TARGET_NO_KNOCKBACK;
 			}
 			break;
@@ -3134,26 +3135,6 @@ int unit_remove_map_(struct block_list *bl, clr_type clrtype, const char* file, 
 }
 
 /**
- * Refresh the area with a change in display of a unit.
- * @bl: Object to update
- */
-void unit_refresh(struct block_list *bl) {
-	nullpo_retv(bl);
-
-	if (bl->m < 0)
-		return;
-
-	struct map_data *mapdata = map_getmapdata(bl->m);
-
-	// Using CLR_TRICKDEAD because other flags show effects
-	// Probably need to use another flag or other way to refresh it
-	if (mapdata->users) {
-		clif_clearunit_area(bl, CLR_TRICKDEAD); // Fade out
-		clif_spawn(bl); // Fade in
-	}
-}
-
-/**
  * Removes units of a master when the master is removed from map
  * @param sd: Player
  * @param clrtype: How bl is being removed
@@ -3302,9 +3283,6 @@ int unit_free(struct block_list *bl, clr_type clrtype)
 			// Clearing...
 			if (sd->bonus_script.head)
 				pc_bonus_script_clear(sd, BSF_REM_ALL);
-
-			skill_clear_unitgroup(bl);
-			status_change_clear(bl,1);
 			break;
 		}
 		case BL_PET: {
@@ -3326,9 +3304,6 @@ int unit_free(struct block_list *bl, clr_type clrtype)
 			if( sd )
 				sd->pd = NULL;
 			pd->master = NULL;
-
-			skill_clear_unitgroup(bl);
-			status_change_clear(bl,1);
 			break;
 		}
 		case BL_MOB: {
@@ -3384,9 +3359,6 @@ int unit_free(struct block_list *bl, clr_type clrtype)
 				md->base_status = NULL;
 			}
 
-			skill_clear_unitgroup(bl);
-			status_change_clear(bl,1);
-
 			if( mob_is_clone(md->mob_id) )
 				mob_clone_delete(md);
 
@@ -3413,9 +3385,6 @@ int unit_free(struct block_list *bl, clr_type clrtype)
 			if( sd )
 				sd->hd = NULL;
 			hd->master = NULL;
-
-			skill_clear_unitgroup(bl);
-			status_change_clear(bl,1);
 			break;
 		}
 		case BL_MER: {
@@ -3436,9 +3405,6 @@ int unit_free(struct block_list *bl, clr_type clrtype)
 
 			mercenary_contract_stop(md);
 			md->master = NULL;
-
-			skill_clear_unitgroup(bl);
-			status_change_clear(bl,1);
 			break;
 		}
 		case BL_ELEM: {
@@ -3459,13 +3425,12 @@ int unit_free(struct block_list *bl, clr_type clrtype)
 
 			elemental_summon_stop(ed);
 			ed->master = NULL;
-
-			skill_clear_unitgroup(bl);
-			status_change_clear(bl,1);
 			break;
 		}
 	}
 
+	skill_clear_unitgroup(bl);
+	status_change_clear(bl,1);
 	map_deliddb(bl);
 
 	if( bl->type != BL_PC ) // Players are handled by map_quit

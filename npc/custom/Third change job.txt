@@ -1,0 +1,118 @@
+//job
+
+
+prontera,157,197,6	script	Third Job Changer	10192,{
+mes "Welcome!";
+mes "I am here to fix third job quest issues. It includes ninja and gunslingers.";
+mes "You need to be base level 99, job 70 and up, you need to be rebirth and 4,000,000 zeny.";
+next;
+switch(select("Proceed:Cancel")){
+    case 1:
+        if (BaseLevel > 98 && JobLevel > 69 ){
+            if (Zeny > 1249999){
+                if (checkfalcon() || checkcart() || checkriding() || ismounting()) {
+                    mes "Please remove your " +
+                        ((checkfalcon()) ? "falcon" : "") +
+                        ((checkcart()) ? "cart" : "") +
+                        ((checkriding()) ? "Peco" : "") +
+                        ((ismounting()) ? "mount" : "") +
+                        " before proceeding.";
+                    close;
+                }
+                if (.SkillPointCheck && SkillPoint) {
+                    mes "Please use all your skill points before proceeding.";
+                    close;
+                }
+                if (Class == Job_Lord_Knight){
+                    jobchange 4060;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+                else if (Class == Job_Paladin){
+                    jobchange 4073;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+                else if (Class == Job_High_Wizard){
+                    jobchange 4061;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+                else if (Class == Job_Professor){
+                    jobchange 4074;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+                else if (Class == Job_Sniper){
+                    jobchange 4062;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+                else if (Class == Job_Clown){
+                    jobchange 4075;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+                else if (Class == Job_Gypsy){
+                    jobchange 4076;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+                else if (Class == Job_High_Priest){
+                    jobchange 4063;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+                else if (Class == Job_Champion){
+                    jobchange 4077;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+                else if (Class == Job_Whitesmith){
+                    jobchange 4064;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+                else if (Class == Job_Creator){
+                    jobchange 4078;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+                else if (Class == Job_Assassin_Cross){
+                    jobchange 4065;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+                else if (Class == Job_Stalker){
+                    jobchange 4079;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+				else if (Class == Job_Ninja){
+                    jobchange 4211,4212;
+					set JobLevel, 70;
+					set SkillPoint, 0;
+                }
+				else if (Class == Job_Gunslinger){
+                    callfunc "Job_Change",Job_Rebellion;
+                }
+                else {
+                mes "Your class is not elligible for the use of my services.";
+                close;
+                }
+                Zeny -= 4000000;
+            }
+            else{
+                mes "You do not have the proper amount of money to proceed.";
+                close;
+            }
+        }
+        else{
+            mes "You do not have the proper levels to proceed.";
+            close;
+        }
+
+    case 2:
+        close;
+    }
+}
